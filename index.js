@@ -11,7 +11,7 @@ const reporterAdminRoutes = require('./routes/adminRoutes/reporterAdmin/adminRep
 const adminAuth = require('./routes/adminRoutes/adminAuth/adminAuth') 
 const raiseYourVoiceRoutes = require("./routes/RaiseYourVoice/raiseYourVoiceRoutes")
 const adminRaiseYourVoice = require("./routes/adminRoutes/adminRaiseYourVoice/raiseYourVoiceStatus")
-const publicReporterRoutes = require("./routes/publicRoutes/publicReporterRoutes")
+const publicUserRoutes = require('./routes/userRoutes/publicUserRoutes')
 const path = require('path')
 const multerErrorHandler = require('./middlewares/multer/errorHandler')
 
@@ -38,8 +38,19 @@ try{
     // Apply multer error handler middleware
     app.use(multerErrorHandler)
     
+    // Health check endpoint
+    app.get('/', (req, res) => {
+        res.status(200).json({
+            success: true,
+            message: 'IINSAF Backend Server is live and running!',
+            timestamp: new Date().toISOString(),
+            status: 'healthy',
+            port: process.env.PORT || 3000,
+            server: `http://localhost:${process.env.PORT || 3000}`
+        });
+    });
+    
     //Routes
-    app.use('/api/public', publicReporterRoutes) // Public routes - no authentication required
     app.use(adsAdminRoute)
     app.use(userRoutes)
     app.use(advertiserRoutes)
@@ -48,6 +59,7 @@ try{
     app.use(adminAuth)
     app.use(raiseYourVoiceRoutes)
     app.use(adminRaiseYourVoice)
+    app.use(publicUserRoutes) // Public user routes (no authentication required)
 
 
     const PORT = process.env.PORT;
